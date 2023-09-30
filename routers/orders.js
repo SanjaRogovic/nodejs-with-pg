@@ -34,4 +34,20 @@ ordersRouter.get("/:id", async (req, res) => {
 })
 
 
+// ROUTE to CREATE a NEW ORDER - POST method
+
+ordersRouter.post("/", async (req, res) => {
+    const {price, date, user_id} = req.body;
+    // console.log(req.body)
+    try {
+        const result = await pool.query(
+            "INSERT INTO orders (price, date, user_id) VALUES ($1, $2, $3) RETURNING *;", [price, date, user_id])
+        res.json(result.rows[0])
+    }
+    catch (error) {
+        res.status(500).json(error)
+    }
+})
+
+
 export default ordersRouter
