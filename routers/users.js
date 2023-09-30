@@ -79,7 +79,7 @@ usersRouter.put("/:id", userValidation, async (req, res) => {
         return res.status(404).json({"UNSUCCESSFUL - User not updated": errors.array()})
     }
 
-    const id = req.params.id
+    const {id} = req.params
     const {first_name, last_name, age} = req.body
     try {
         const result = await pool.query(
@@ -144,28 +144,30 @@ usersRouter.get("/:id/orders", async (req, res) => {
 
 // ROUTE to set USER INACTIVE if he has never ordered anything
 
-// usersRouter.put("/:id/check-inactive", userValidation, async (req, res) => {
-//     const errors = validationResult(req)
+usersRouter.put("/:id/check-inactive", userValidation, async (req, res) => {
+    const errors = validationResult(req)
 
-//     if(!errors.isEmpty()) {
-//         return res.status(404).json({"UNSUCCESSFUL - User not updated": errors.array()})
-//     }
+    if(!errors.isEmpty()) {
+        return res.status(404).json({"UNSUCCESSFUL - User not updated": errors.array()})
+    }
 
-//     const id = req.params.id
-//     const {active} = req.body
+    const id = req.params.id
+    const {active} = req.body
 
-//     if (id === active) {
-
-//     }
-//     try {
-//         const result = await pool.query(
-//             "UPDATE users SET active=$1 WHERE id=$2 RETURNING *;", [active, id])
-//         res.json(result.rows[0])
-//     }
-//     catch (error) {
-//         res.status(404).json(error)
-//     }
-// })
+    try {
+        const result = await pool.query(
+            "UPDATE users SET active=$1 WHERE id=$2 RETURNING *;", [active, id])
+            if (result.rows.length === 0) {
+                const result = await pool.query("UPDATE users SET active=false WHERE id=$1 Returning *;", [id])
+                res.json(result.rows[0])
+            } else {
+                res.status(404).jason({message: "Update unsuccessful"})
+            }
+    }
+    catch (error) {
+        res.status(404).json(error)
+    }
+})
 
 
   export default usersRouter;
