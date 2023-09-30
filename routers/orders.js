@@ -1,11 +1,8 @@
 import express from "express";
 const ordersRouter = express.Router()
-import pg from "pg"
+import pool from "../pool.js";
 import {body, validationResult} from "express-validator"
 
-const {Pool} = pg
-
-const pool = new Pool()
 
 
 // ORDER VALIDATION for both POST and PUT method
