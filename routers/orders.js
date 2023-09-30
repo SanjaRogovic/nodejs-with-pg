@@ -1,10 +1,18 @@
 import express from "express";
 const ordersRouter = express.Router()
 import pg from "pg"
+import {body, validationResult} from "express-validator"
 
 const {Pool} = pg
 
 const pool = new Pool()
+
+
+// ORDER VALIDATION for both POST and PUT method
+const orderValidation = [
+    body("price").isInt().exists().withMessage("Only whole number accepted"),
+    body("date").isString().exists().withMessage("Only string accepted")
+]
 
 
 // ROUTE to ALL ORDERS - GET method
@@ -12,7 +20,6 @@ const pool = new Pool()
 ordersRouter.get("/", async (req,res) => {
     try {
         const result = await pool.query("SELECT * FROM orders;")
-        // console.log(result.rows)
         res.json(result.rows)
     }
     catch (error) {
@@ -37,7 +44,13 @@ ordersRouter.get("/:id", async (req, res) => {
 
 // ROUTE to CREATE a NEW ORDER - POST method
 
-ordersRouter.post("/", async (req, res) => {
+ordersRouter.post("/", orderValidation, async (req, res) => {
+    const errors = validationResult(req)
+
+    if(!errors.isEmpty()) {
+        return res.status(404).json({"UNSUCCESSFUL - Order not created": errors.array()})
+    }
+
     const {price, date, user_id} = req.body;
     // console.log(req.body)
     try {
@@ -53,7 +66,13 @@ ordersRouter.post("/", async (req, res) => {
 
 // ROUTE to EDIT one order (with the id) - PUT method
 
-ordersRouter.put("/:id", async (req, res) => {
+ordersRouter.put("/:id", orderValidation, async (req, res) => {
+    const errors = validationResult(req)
+
+    if(!errors.isEmpty()) {
+        return res.status(404).json({"UNSUCCESSFUL - Order not updated": errors.array()})
+    }
+
     const {id} = req.params
     const {price} = req.body
     try {
