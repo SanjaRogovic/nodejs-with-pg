@@ -92,33 +92,6 @@ usersRouter.put("/:id", userValidation, async (req, res) => {
 })
 
 
-// ROUTE to set USER INACTIVE if he has never ordered anything
-
-// usersRouter.put("/:id/check-inactive", userValidation, async (req, res) => {
-//     const errors = validationResult(req)
-
-//     if(!errors.isEmpty()) {
-//         return res.status(404).json({"UNSUCCESSFUL - User not updated": errors.array()})
-//     }
-
-//     const id = req.params.id
-//     const {active} = req.body
-
-//     if (id === user_id) {
-
-
-//     }
-//     try {
-//         const result = await pool.query(
-//             "UPDATE users SET active=$1 WHERE id=$2 RETURNING *;", [active, id])
-//         res.json(result.rows[0])
-//     }
-//     catch (error) {
-//         res.status(404).json(error)
-//     }
-// })
-
-
 
 // PUT method for editing only one column in the users table
 
@@ -159,12 +132,40 @@ usersRouter.delete("/:id", async (req, res) => {
 usersRouter.get("/:id/orders", async (req, res) => {
     const {id} = req.params
     try {
-        const result = await pool.query("SELECT * FROM users WHERE id=$1;", [id])
+        const result = await pool.query(
+            "SELECT users.id, orders.id FROM users, orders WHERE users.id = orders.user_id AND users.id=$1;", [id])
         res.json(result.rows)
     }
     catch (error) {
         res.status(404).json ({"Order not found": error})
     }
 })
+
+
+// ROUTE to set USER INACTIVE if he has never ordered anything
+
+// usersRouter.put("/:id/check-inactive", userValidation, async (req, res) => {
+//     const errors = validationResult(req)
+
+//     if(!errors.isEmpty()) {
+//         return res.status(404).json({"UNSUCCESSFUL - User not updated": errors.array()})
+//     }
+
+//     const id = req.params.id
+//     const {active} = req.body
+
+//     if (id === active) {
+
+//     }
+//     try {
+//         const result = await pool.query(
+//             "UPDATE users SET active=$1 WHERE id=$2 RETURNING *;", [active, id])
+//         res.json(result.rows[0])
+//     }
+//     catch (error) {
+//         res.status(404).json(error)
+//     }
+// })
+
 
   export default usersRouter;
