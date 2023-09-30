@@ -50,4 +50,37 @@ ordersRouter.post("/", async (req, res) => {
 })
 
 
+// ROUTE to EDIT one order (with the id) - PUT method
+
+ordersRouter.put("/:id", async (req, res) => {
+    const {id} = req.params
+    const {user_id} = req.body
+    try {
+        const result = await pool.query(
+            "UPDATE orders SET id=$1 WHERE user_id=$2 RETURNING *;", [id, user_id])
+        res.json(result.rows[0])
+    }
+    catch (error) {
+        res.status(404).json("Order not found", error)
+    }
+
+})
+
+// Route to DELETE order (with the id)
+
+ordersRouter.delete("/:id", async (req, res) => {
+    const {id} = req.params
+    try {
+        const result = await pool.query(
+            "DELETE FROM orders WHERE id=$1 RETURNING *;", [id])
+        res.json(result.rows[0])
+    }
+    catch (error) {
+        res.status(404).json("Order not found", error)
+    }
+
+})
+
+
+
 export default ordersRouter

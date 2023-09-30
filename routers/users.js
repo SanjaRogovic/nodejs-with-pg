@@ -56,7 +56,7 @@ usersRouter.post("/", async (req, res) => {
 })
 
 
-// ROUTE to EDIT one user - PUT method  - How to edit all for user? Below code not working
+// ROUTE to EDIT one user (with the id) - PUT method  - How to edit all for user? Below code not working
 
 // usersRouter.put("/:id", async (req, res) => {
 //     const {id} = req.params
