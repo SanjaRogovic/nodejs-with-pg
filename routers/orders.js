@@ -6,6 +6,7 @@ const {Pool} = pg
 
 const pool = new Pool()
 
+
 // ROUTE to ALL ORDERS - GET method
 
 ordersRouter.get("/", async (req,res) => {
@@ -54,17 +55,17 @@ ordersRouter.post("/", async (req, res) => {
 
 ordersRouter.put("/:id", async (req, res) => {
     const {id} = req.params
-    const {user_id} = req.body
+    const {price} = req.body
     try {
         const result = await pool.query(
-            "UPDATE orders SET id=$1 WHERE user_id=$2 RETURNING *;", [id, user_id])
+            "UPDATE orders SET price=$1 WHERE id=$2 RETURNING *;", [price, id])
         res.json(result.rows[0])
     }
     catch (error) {
         res.status(404).json("Order not found", error)
     }
-
 })
+
 
 // Route to DELETE order (with the id)
 
@@ -78,9 +79,8 @@ ordersRouter.delete("/:id", async (req, res) => {
     catch (error) {
         res.status(404).json("Order not found", error)
     }
-
 })
 
 
 
-export default ordersRouter
+export default ordersRouter;
