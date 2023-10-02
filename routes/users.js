@@ -53,7 +53,7 @@ usersRouter.post("/", userValidation, async (req, res) => {
     const errors = validationResult(req)
 
     if(!errors.isEmpty()) {
-        return res.status(404).json({"UNSUCCESSFUL - User not created": errors.array()})
+        return res.status(400).json({"UNSUCCESSFUL - User not created": errors.array()})
     }
 
     const {first_name, last_name, age} = req.body;
@@ -64,7 +64,7 @@ usersRouter.post("/", userValidation, async (req, res) => {
         res.json(result.rows[0])
     }
     catch (error) {
-        res.status(500).json(error)
+        res.status(400).json(error)
         }   
     })
 
