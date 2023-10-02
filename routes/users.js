@@ -22,9 +22,9 @@ const userValidation = [
 /* Marks the current validation chain as optional. An optional field skips validation depending on its value, instead of failing it.
 Modifier .optional() is not positional: it'll affect how values are interpreted, no matter where it happens in the chain.*/
 const partialEditValidator = [
-    body('first_name').isString().notEmpty().isLength({ min: 1 }).optional(),
-    body('last_name').isString().exists().isLength({ min: 1 }).optional(),
-    body('age').isInt().exists().isLength({ min: 1 }).optional()
+    body('first_name').isString().notEmpty().optional(),
+    body('last_name').isString().notEmpty().optional(),
+    body('age').isInt({ min: 1 }).exists().optional()
 ]
 
 
