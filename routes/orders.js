@@ -1,6 +1,6 @@
 import express from "express";
 const ordersRouter = express.Router()
-import pool from "../pool.js";
+import pool from "../db/pool.js";
 import {body, validationResult} from "express-validator"
 
 

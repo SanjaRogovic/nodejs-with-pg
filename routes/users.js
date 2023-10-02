@@ -1,6 +1,6 @@
 import  express  from "express";
 const usersRouter = express.Router()
-import pool from "../pool.js";
+import pool from "../db/pool.js";
 import {body, validationResult} from "express-validator"
 
 
@@ -27,7 +27,7 @@ usersRouter.get("/", async (req,res) => {
         res.json(result.rows)
     }
     catch (error) {
-        res.status(404).json( error)
+        res.status(404).json({"Users not found": error})
     }
 })
 
@@ -64,7 +64,7 @@ usersRouter.post("/", userValidation, async (req, res) => {
         res.json(result.rows[0])
     }
     catch (error) {
-        res.status(400).json(error)
+        res.status(500).json(error)
         }   
     })
 
@@ -76,7 +76,7 @@ usersRouter.put("/:id", userValidation, async (req, res) => {
     const errors = validationResult(req)
 
     if(!errors.isEmpty()) {
-        return res.status(404).json({"UNSUCCESSFUL - User not updated": errors.array()})
+        return res.status(400).json({"UNSUCCESSFUL - All fields must be updated": errors.array()})
     }
 
     const {id} = req.params
@@ -87,7 +87,7 @@ usersRouter.put("/:id", userValidation, async (req, res) => {
         res.json(result.rows[0])
     }
     catch (error) {
-        res.status(404).json(error)
+        res.status(500).json({"User does not exist": error})
     }
 })
 
@@ -96,6 +96,11 @@ usersRouter.put("/:id", userValidation, async (req, res) => {
 // PUT method for editing only one column in the users table
 
 // usersRouter.put("/:id", async (req, res) => {
+//     const errors = validationResult(req)
+
+//     if(!errors.isEmpty()) {
+//         return res.status(400).json({"UNSUCCESSFUL - User not updated": errors.array()})
+//     }
 //     const {id} = req.params
 //     const {first_name} = req.body
 //     try {
@@ -104,15 +109,20 @@ usersRouter.put("/:id", userValidation, async (req, res) => {
 //         res.json(result.rows[0])
 //     }
 //     catch (error) {
-//         res.status(404).json({"User not found": error)}
+//         res.status(404).json({"User not found": error})
 //     }
-
 // })
 
 
 // Route to DELETE user (with the id)
 
 usersRouter.delete("/:id", async (req, res) => {
+    const errors = validationResult(req)
+
+    if(!errors.isEmpty()) {
+        return res.status(500).json({"UNSUCCESSFUL": errors.array()})
+    }
+
     const {id} = req.params
     try {
         const result = await pool.query(
@@ -145,27 +155,27 @@ usersRouter.get("/:id/orders", async (req, res) => {
 // ROUTE to set USER INACTIVE if he has never ordered anything
 
 usersRouter.put("/:id/check-inactive", userValidation, async (req, res) => {
-    const errors = validationResult(req)
+    // const errors = validationResult(req)
 
-    if(!errors.isEmpty()) {
-        return res.status(404).json({"UNSUCCESSFUL - User not updated": errors.array()})
-    }
+    // if(!errors.isEmpty()) {
+    //     return res.status(404).json({"UNSUCCESSFUL - User not updated": errors.array()})
+    // }
 
-    const id = req.params.id
-    const {active} = req.body
+    const {id }= req.params
+    // const {active} = req.body
 
     try {
         const result = await pool.query(
-            "UPDATE users SET active=$1 WHERE id=$2 RETURNING *;", [active, id])
+            "SELECT * FROM orders WHERE id=$1 RETURNING *;", [id])
             if (result.rows.length === 0) {
-                const result = await pool.query("UPDATE users SET active=false WHERE id=$1 Returning *;", [id])
-                res.json(result.rows[0])
+                const {rows} = await pool.query("UPDATE users SET active=false WHERE id=$1 Returning *;", [id])
+                res.json(rows[0])
             } else {
-                res.status(404).jason({message: "Update unsuccessful"})
+                res.status(500).json({"Update unsuccessful": errors})
             }
     }
     catch (error) {
-        res.status(404).json(error)
+        res.status(404).json({"User not found": error})
     }
 })
 
