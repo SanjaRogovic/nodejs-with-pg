@@ -15,7 +15,7 @@ import {body, validationResult} from "express-validator"
 const userValidation = [
     body("first_name").isString().notEmpty(),
     body("last_name").isString().notEmpty(),
-    body("age").isInt({ min: 1 }).exists()
+    body("age").isInt().exists()
 ]
 
 // Validator for PUT method - partial edit of a user
@@ -24,7 +24,7 @@ Modifier .optional() is not positional: it'll affect how values are interpreted,
 const partialEditValidator = [
     body('first_name').isString().notEmpty().optional(),
     body('last_name').isString().notEmpty().optional(),
-    body('age').isInt({ min: 1 }).exists().optional()
+    body('age').isInt().exists().optional()
 ]
 
 
